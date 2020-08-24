@@ -1,0 +1,13 @@
+<form action="/" method="POST">
+  
+<tbody>    
+  <tr>
+    <th><input name="id" id="id" type=hidden value=<%=  @id.to_i%> ></th>
+    <th><input name="todo"  id = "todo" rows="5" placeholder=<%= @todo%> ></th>
+    <th><input name="detail" id = "detail" rows="5" placeholder=<%= @detail%> ></th>
+  </tr>
+</tbody>
+
+<input type="submit" class="btn btn-outline-primary" value="変更">   
+  <input type="hidden" name="_method" value="PATCH"> <!-- この1行を追加！ -->
+</form>
