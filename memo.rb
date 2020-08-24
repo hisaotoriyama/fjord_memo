@@ -7,7 +7,6 @@ require 'json'
 
 get '/' do
   @file_contents = read_file('memo.json')
-  p @file_contents
   erb :top
 end
 
@@ -17,11 +16,11 @@ end
 
 post '/create' do
   @file_contents = read_file('memo.json')
-  if @file_contents == []
-    new_id = 1
-  else
-    new_id = @file_contents.last['id'] + 1
-  end
+  new_id = if @file_contents == []
+             1
+           else
+             @file_contents.last['id'] + 1
+           end
   @file_contents << { "id": new_id, "todo": params['todo'], "detail": params['detail'] }
   write_file(@file_contents, 'memo.json')
   redirect '/'
@@ -51,7 +50,9 @@ patch '/' do
   @selected_content = @selected_content[0]
   @selected_content['todo'] = params['todo']
   @selected_content['detail'] = params['detail']
-  write_file(@contents, 'memo.json')
+  @id = params['id'].to_i
+  @file_contents[@id - 1] = @selected_content
+  write_file(@file_contents, 'memo.json')
   redirect '/'
 end
 
@@ -60,7 +61,6 @@ delete '/delete/:id' do
   @selected_contents = @file_contents.reject do |content|
     content['id'] == params['id'].to_i
   end
-  p @selected_contents
   write_file(@selected_contents, 'memo.json')
   redirect '/'
 end
