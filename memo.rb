@@ -28,10 +28,7 @@ end
 
 get '/show/:id' do
   @file_contents = read_file('memo.json')
-  @selected_content = @file_contents.select do |content|
-    content['id'] == params['id'].to_i
-  end
-  @selected_content = @selected_content[0]
+  @content =  select_content(@file_contents)
   erb :show
 end
 
@@ -44,24 +41,21 @@ end
 
 patch '/' do
   @file_contents = read_file('memo.json')
-  @selected_content = @file_contents.select do |content|
-    content['id'] == params['id'].to_i
-  end
-  @selected_content = @selected_content[0]
-  @selected_content['todo'] = params['todo']
-  @selected_content['detail'] = params['detail']
+  @content = select_content(@file_contents)
+  @content['todo'] = params['todo']
+  @content['detail'] = params['detail']
   @id = params['id'].to_i
-  @file_contents[@id - 1] = @selected_content
+  @file_contents[@id - 1] = @content
   write_file(@file_contents, 'memo.json')
   redirect '/'
 end
 
 delete '/delete/:id' do
   @file_contents = read_file('memo.json')
-  @selected_contents = @file_contents.reject do |content|
+  @contents = @file_contents.reject do |content|
     content['id'] == params['id'].to_i
   end
-  write_file(@selected_contents, 'memo.json')
+  write_file(@contents, 'memo.json')
   redirect '/'
 end
 
@@ -79,4 +73,10 @@ def write_file(file_contents, file)
   File.open(file, 'w') do |f|
     JSON.dump(file_contents, f)
   end
+end
+
+def select_content(file_contents)
+  file_contents.select do |content|
+    content['id'] == params['id'].to_i
+  end.first
 end

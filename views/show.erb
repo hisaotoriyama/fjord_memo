@@ -1,18 +1,18 @@
 <tbody>   
   <tr>
-    <th><%= "メモ#{@selected_content["id"]}" %></th>
-    <th><%= @selected_content["todo"]%></th>
-    <th><%= @selected_content["detail"]%></th>
+    <th><%= "メモ#{@content["id"]}" %></th>
+    <th><%= @content["todo"]%></th>
+    <th><%= @content["detail"]%></th>
   </tr>
 </tbody>
 
-<form action="/edit/<%= @selected_content["id"] %>" method="GET">
-  <input  type="submit" class="btn btn-outline-primary" value="変更">
-  <input name="todo" id="todo" type=hidden value=<%=  @selected_content["todo"]%> >
-  <input name="detail" id="detail" type=hidden value=<%=  @selected_content["detail"]%> >
+<form action="/edit/<%= @content["id"] %>" method="GET">
+  <input  type="submit"  value="変更">
+  <input name="todo" id="todo" type=hidden value=<%=  @content["todo"]%> >
+  <input name="detail" id="detail" type=hidden value=<%=  @content["detail"]%> >
 </form>
 
-<form action="/delete/<%= @selected_content["id"] %>" method="POST">
-  <input  type="submit" class="btn btn-outline-primary" value="削除">
+<form action="/delete/<%= @content["id"] %>" method="POST">
+  <input  type="submit" value="削除">
   <input type="hidden" name="_method" value="DELETE"> <!-- この1行を追加！ -->
 </form>
