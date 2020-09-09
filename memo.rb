@@ -16,12 +16,15 @@ get '/new' do
 end
 
 post '/create' do
-  add_new
+  todo = params['todo']
+  detail = params['detail']
+  add_new(todo, detail)
   redirect '/'
 end
 
 get '/show/:id' do
-  @content = read_selected
+  id_num = params['id'].to_i
+  @content = read_selected(id_num)
   erb :show
 end
 
@@ -33,12 +36,16 @@ get '/edit/:id' do
 end
 
 patch '/' do
-  update_selected
+  id_num = params['id'].to_i
+  todo = params['todo']
+  detail = params['detail']
+  update_selected(id_num, todo, detail)
   redirect '/'
 end
 
 delete '/delete/:id' do
-  delete_selected
+  id_num = params['id'].to_i
+  delete_selected(id_num)
   redirect '/'
 end
 
@@ -47,45 +54,38 @@ get '/layout' do
 end
 
 def read_all
-  connection = PG.connect(dbname: 'memodb', port: '5432')
-  results = connection.exec('SELECT * FROM memo_table;')
+  results = db_connect.exec('SELECT * FROM memo_table;')
   convert_memodata(results)
 end
 
-def read_selected
-  id_num = params['id'].to_i
-  connection = PG.connect(dbname: 'memodb', port: '5432')
-  results = connection.exec("SELECT * FROM memo_table WHERE id ='#{id_num}';")
+def read_selected(id_num)
+  results = db_connect.exec("SELECT * FROM memo_table WHERE id ='#{id_num}';")
   convert_memodata(results).first
 end
 
 def convert_memodata(results)
   all_data = []
   results.each do |result|
-    # #idがなぜかntegerからstringsになっていたので修正
     result['id'] = result['id'].to_i
     all_data << result
   end
   all_data
 end
 
-def delete_selected
-  id_num = params['id'].to_i
-  connection = PG.connect(dbname: 'memodb', port: '5432')
-  connection.exec("DELETE FROM memo_table WHERE id ='#{id_num}';")
+def delete_selected(id_num)
+  db_connect.exec("DELETE FROM memo_table WHERE id ='#{id_num}';")
 end
 
-def update_selected
-  id_num = params['id'].to_i
-  todo = params['todo']
-  detail = params['detail']
-  connection = PG.connect(dbname: 'memodb', port: '5432')
-  connection.exec("UPDATE memo_table SET todo = '#{todo}', detail='#{detail}' WHERE id ='#{id_num}';")
+def update_selected(id_num, todo, detail)
+  db_connect.exec("UPDATE memo_table SET todo = '#{todo}', detail='#{detail}' WHERE id ='#{id_num}';")
 end
 
-def add_new
-  todo = params['todo']
-  detail = params['detail']
-  connection = PG.connect(dbname: 'memodb', port: '5432')
-  connection.exec("INSERT INTO memo_table (todo, detail) VALUES ('#{todo}', '#{detail}');")
+def add_new(todo, detail)
+  db_connect.exec("INSERT INTO memo_table (todo, detail) VALUES ('#{todo}', '#{detail}');")
+end
+
+DB = 'memodb'
+PORT = '5432'
+def db_connect
+  PG.connect(dbname: DB, port: PORT)
 end
