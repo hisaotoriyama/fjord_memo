@@ -23,8 +23,8 @@ post '/create' do
 end
 
 get '/show/:id' do
-  id_num = params['id'].to_i
-  @content = read_selected(id_num)
+  id = params['id'].to_i
+  @content = read_selected(id)
   erb :show
 end
 
@@ -36,16 +36,16 @@ get '/edit/:id' do
 end
 
 patch '/' do
-  id_num = params['id'].to_i
+  id = params['id'].to_i
   todo = params['todo']
   detail = params['detail']
-  update_selected(id_num, todo, detail)
+  update_selected(id, todo, detail)
   redirect '/'
 end
 
 delete '/delete/:id' do
-  id_num = params['id'].to_i
-  delete_selected(id_num)
+  id = params['id'].to_i
+  delete_selected(id)
   redirect '/'
 end
 
@@ -58,8 +58,8 @@ def read_all
   convert_memodata(results)
 end
 
-def read_selected(id_num)
-  results = db_connect.exec("SELECT * FROM memo_table WHERE id ='#{id_num}';")
+def read_selected(id)
+  results = db_connect.exec('SELECT * FROM memo_table WHERE id = $1', [id])
   convert_memodata(results).first
 end
 
@@ -72,16 +72,16 @@ def convert_memodata(results)
   all_data
 end
 
-def delete_selected(id_num)
-  db_connect.exec("DELETE FROM memo_table WHERE id ='#{id_num}';")
+def delete_selected(id)
+  db_connect.exec('DELETE FROM memo_table WHERE id = $1', [id])
 end
 
-def update_selected(id_num, todo, detail)
-  db_connect.exec("UPDATE memo_table SET todo = '#{todo}', detail='#{detail}' WHERE id ='#{id_num}';")
+def update_selected(id, todo, detail)
+  db_connect.exec('UPDATE memo_table SET todo =$2, detail = $3 WHERE id = $1', [id, todo, detail])
 end
 
 def add_new(todo, detail)
-  db_connect.exec("INSERT INTO memo_table (todo, detail) VALUES ('#{todo}', '#{detail}');")
+  db_connect.exec('INSERT INTO memo_table (todo, detail) VALUES ($1,$2)', [todo, detail])
 end
 
 DB = 'memodb'
