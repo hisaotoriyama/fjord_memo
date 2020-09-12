@@ -15,7 +15,7 @@ get '/new' do
   erb :new
 end
 
-post '/create' do
+post '/' do
   todo = params['todo']
   detail = params['detail']
   add_new(todo, detail)
@@ -43,7 +43,7 @@ patch '/' do
   redirect '/'
 end
 
-delete '/delete/:id' do
+delete '/:id' do
   id = params['id'].to_i
   delete_selected(id)
   redirect '/'
