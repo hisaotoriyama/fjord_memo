@@ -22,13 +22,13 @@ post '/' do
   redirect '/'
 end
 
-get '/show/:id' do
+get '/memos/:id' do
   id = params['id'].to_i
   @content = read_selected(id)
   erb :show
 end
 
-get '/edit/:id' do
+get '/memos/:id/edit' do
   @id = params['id']
   @todo = params['todo']
   @detail = params['detail']

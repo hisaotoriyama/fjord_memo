@@ -6,7 +6,7 @@
   </tr>
 </tbody>
 
-<form action="/edit/<%= @content["id"] %>" method="GET">
+<form action="/memos/<%= @content["id"]%>/edit " method="GET">
   <input  type="submit"  value="変更">
   <input name="todo" id="todo" type=hidden value=<%=  @content["todo"]%> >
   <input name="detail" id="detail" type=hidden value=<%=  @content["detail"]%> >
