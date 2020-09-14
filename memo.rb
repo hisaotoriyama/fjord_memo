@@ -54,7 +54,7 @@ get '/layout' do
 end
 
 def read_all
-  results = db_connect.exec('SELECT * FROM memo_table;')
+  results = db_connect.exec('SELECT * FROM memo_table')
   convert_memodata(results)
 end
 
@@ -77,11 +77,11 @@ def delete_selected(id)
 end
 
 def update_selected(id, todo, detail)
-  db_connect.exec('UPDATE memo_table SET todo =$2, detail = $3 WHERE id = $1', [id, todo, detail])
+  db_connect.exec('UPDATE memo_table SET todo = $2, detail = $3 WHERE id = $1', [id, todo, detail])
 end
 
 def add_new(todo, detail)
-  db_connect.exec('INSERT INTO memo_table (todo, detail) VALUES ($1,$2)', [todo, detail])
+  db_connect.exec('INSERT INTO memo_table (todo, detail) VALUES ($1, $2)', [todo, detail])
 end
 
 DB = 'memodb'
