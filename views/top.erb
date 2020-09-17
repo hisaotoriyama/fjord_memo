@@ -1,8 +1,8 @@
 <form action="new" method="GET">
 <tbody>    
-  <% @file_contents.each do |content| %>
+  <% @contents.each do |content| %>
   <tr>
-   <th><a href = "show/<%= content["id"] %>">メモ<%= content["id"] %></a></th>
+   <th><a href = "memos/<%= content["id"] %>">メモ<%= content["id"] %></a></th>
    <th><%= content["todo"]%></th>
    <th><%= content["detail"]%></th>
 

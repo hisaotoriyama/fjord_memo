@@ -6,13 +6,13 @@
   </tr>
 </tbody>
 
-<form action="/edit/<%= @content["id"] %>" method="GET">
+<form action="/memos/<%= @content["id"]%>/edit " method="GET">
   <input  type="submit"  value="変更">
   <input name="todo" id="todo" type=hidden value=<%=  @content["todo"]%> >
   <input name="detail" id="detail" type=hidden value=<%=  @content["detail"]%> >
 </form>
 
-<form action="/delete/<%= @content["id"] %>" method="POST">
+<form action="/<%= @content["id"] %>" method="POST">
   <input  type="submit" value="削除">
   <input type="hidden" name="_method" value="DELETE"> <!-- この1行を追加！ -->
 </form>

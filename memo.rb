@@ -4,9 +4,10 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'sinatra/content_for'
 require 'json'
+require 'pg'
 
 get '/' do
-  @file_contents = read_file('memo.json')
+  @contents = read_all
   erb :top
 end
 
@@ -14,25 +15,20 @@ get '/new' do
   erb :new
 end
 
-post '/create' do
-  @file_contents = read_file('memo.json')
-  new_id = if @file_contents == []
-             1
-           else
-             @file_contents.last['id'] + 1
-           end
-  @file_contents << { "id": new_id, "todo": params['todo'], "detail": params['detail'] }
-  write_file(@file_contents, 'memo.json')
+post '/' do
+  todo = params['todo']
+  detail = params['detail']
+  add_new(todo, detail)
   redirect '/'
 end
 
-get '/show/:id' do
-  @file_contents = read_file('memo.json')
-  @content =  select_content(@file_contents)
+get '/memos/:id' do
+  id = params['id'].to_i
+  @content = read_selected(id)
   erb :show
 end
 
-get '/edit/:id' do
+get '/memos/:id/edit' do
   @id = params['id']
   @todo = params['todo']
   @detail = params['detail']
@@ -40,22 +36,16 @@ get '/edit/:id' do
 end
 
 patch '/' do
-  @file_contents = read_file('memo.json')
-  @content = select_content(@file_contents)
-  @content['todo'] = params['todo']
-  @content['detail'] = params['detail']
-  @id = params['id'].to_i
-  @file_contents[@id - 1] = @content
-  write_file(@file_contents, 'memo.json')
+  id = params['id'].to_i
+  todo = params['todo']
+  detail = params['detail']
+  update_selected(id, todo, detail)
   redirect '/'
 end
 
-delete '/delete/:id' do
-  @file_contents = read_file('memo.json')
-  @contents = @file_contents.reject do |content|
-    content['id'] == params['id'].to_i
-  end
-  write_file(@contents, 'memo.json')
+delete '/:id' do
+  id = params['id'].to_i
+  delete_selected(id)
   redirect '/'
 end
 
@@ -63,20 +53,39 @@ get '/layout' do
   erb :layout
 end
 
-def read_file(json_file)
-  File.open(json_file) do |file|
-    JSON.load(file)
-  end
+def read_all
+  results = db_connect.exec('SELECT * FROM memo_table')
+  convert_memodata(results)
 end
 
-def write_file(file_contents, file)
-  File.open(file, 'w') do |f|
-    JSON.dump(file_contents, f)
-  end
+def read_selected(id)
+  results = db_connect.exec('SELECT * FROM memo_table WHERE id = $1', [id])
+  convert_memodata(results).first
 end
 
-def select_content(file_contents)
-  file_contents.select do |content|
-    content['id'] == params['id'].to_i
-  end.first
+def convert_memodata(results)
+  all_data = []
+  results.each do |result|
+    result['id'] = result['id'].to_i
+    all_data << result
+  end
+  all_data
+end
+
+def delete_selected(id)
+  db_connect.exec('DELETE FROM memo_table WHERE id = $1', [id])
+end
+
+def update_selected(id, todo, detail)
+  db_connect.exec('UPDATE memo_table SET todo = $2, detail = $3 WHERE id = $1', [id, todo, detail])
+end
+
+def add_new(todo, detail)
+  db_connect.exec('INSERT INTO memo_table (todo, detail) VALUES ($1, $2)', [todo, detail])
+end
+
+DB = 'memodb'
+PORT = '5432'
+def db_connect
+  PG.connect(dbname: DB, port: PORT)
 end
